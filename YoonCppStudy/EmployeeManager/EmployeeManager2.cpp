@@ -2,7 +2,7 @@
 #include <string>
 using namespace std;
 
-class Employee
+class Employee // Data: 이름
 {
 private:
 	string m_name;
@@ -14,11 +14,11 @@ public:
 
 	void showName() const
 	{
-		cout << "name: " << m_name << endl;
+		cout << "Name: " << m_name << endl;
 	}
-
+	 
 };
-class PermanentWorker : public Employee  //정규직
+class PermanentWorker : public Employee  //정규직, Data : 이름(상속),연봉
 {
 private:
 	int salary;
@@ -36,35 +36,63 @@ public:
 	void showSalaryInfo() const
 	{
 		showName();
-		cout << "salary: " << getPay() << endl << endl;
+		cout << "Salary: " << getPay() << endl << endl;
 	}
 };
 
-class SalesWorker : public PermanentWorker //영업직
+class SalesWorker : public PermanentWorker //영업직 Data : 이름(상속),연봉(상속),인센티브
 {
 private:
-	int incentive;
-
+	int salesResult;
+	double bonusRatio;
 public:
-	SalesWorker(string name, int money, int incen)
-		:PermanentWorker(name, money), incentive(incen)
+	SalesWorker(string name, int money, double ratio)
+		:PermanentWorker(name, money), salesResult(0), bonusRatio(ratio)
 	{}
 
-	int getIncentive() const { return incentive; }
-
-	void showSalesInfo() const
+	void addSalesResult(int value)
 	{
-		showSalaryInfo();
-		cout << "Incentive: " <<
+		salesResult += value;
 	}
 
+	int getPay() const
+	{
+		return PermanentWorker::getPay() + (int)(salesResult * bonusRatio);
+	}
+
+	void showSalaryInfo() const
+	{
+		showName();
+		cout << "Salary: " << getPay() << endl << endl;
+	}
 };
 
 class TemporaryWorker : public Employee //임시직(알바)
 {
 private:
-	int timeSalary;
-	int workTime;
+	int m_timePay;
+	int m_workTime;
+
+public:
+	TemporaryWorker(string name, int timeSalary)
+		:Employee(name), m_timePay(0), m_workTime(0)
+	{}
+
+	void AddWorkTime(int time)
+	{
+		m_workTime += time;
+	}
+
+	int GetPay() const
+	{
+		return m_workTime * m_timePay;
+	}
+
+	void ShowPayInfo() const
+	{
+		showName();
+		cout << "Pay: " << GetPay() << endl;
+	}
 };
 
 class EmployeeHandler //컨트롤 클래스
