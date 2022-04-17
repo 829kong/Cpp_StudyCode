@@ -2,6 +2,11 @@
 #include <string>
 using namespace std;
 
+enum class Risk_Level
+{
+	Risk_A = 1, Risk_B, Risk_C
+};
+
 class Employee // Data: 이름
 {
 private:
@@ -16,6 +21,10 @@ public:
 	{
 		cout << "Name: " << m_name << endl;
 	}
+
+	virtual int getPay() const = 0;
+
+	virtual void showSalaryInfo() const = 0;
 	 
 };
 class PermanentWorker : public Employee  //정규직, Data : 이름(상속),연봉
@@ -67,6 +76,47 @@ public:
 	}
 };
 
+class ForeignSalesWorker : public SalesWorker
+{
+private:
+	Risk_Level m_risk;
+
+public:
+	ForeignSalesWorker(string name, int money, double ratio, Risk_Level riskLevel)
+		:SalesWorker(name, money, ratio),m_risk(riskLevel)
+	{}
+
+	int getPay() const
+	{
+		return SalesWorker::getPay();
+	}
+
+	int getRiskPay(Risk_Level Risk) const
+	{
+		switch (Risk)
+		{
+		case Risk_Level::Risk_A :
+			return getPay() * 0.3;
+			break;
+		case Risk_Level::Risk_B:
+			return getPay() * 0.2;
+			break;
+		case Risk_Level::Risk_C:
+			return getPay() * 0.1;
+			break;
+		}
+	}
+
+	void showSalaryInfo() const
+	{
+		showName();
+		cout << "Salary: " << getPay() << endl;
+		cout << "Risk: " << getRiskPay(m_risk) << endl;
+		cout << "Sum: " << getPay() + getRiskPay(m_risk) << endl << endl;
+	}
+
+};
+
 class TemporaryWorker : public Employee //임시직(알바)
 {
 private:
@@ -75,7 +125,7 @@ private:
 
 public:
 	TemporaryWorker(string name, int timeSalary)
-		:Employee(name), m_timePay(0), m_workTime(0)
+		:Employee(name), m_timePay(timeSalary), m_workTime(0)
 	{}
 
 	void AddWorkTime(int time)
@@ -83,15 +133,15 @@ public:
 		m_workTime += time;
 	}
 
-	int GetPay() const
+	int getPay() const
 	{
 		return m_workTime * m_timePay;
 	}
 
-	void ShowPayInfo() const
+	void showSalaryInfo() const
 	{
 		showName();
-		cout << "Pay: " << GetPay() << endl;
+		cout << "Salary: " << getPay() << endl<<endl;
 	}
 };
 
@@ -111,18 +161,19 @@ public:
 		empList[empNum++] = emp;
 	}
 
+
 	void showAllSalaryInfo() const
 	{
-		/*for (int i = 0; i < empNum; i++)
-			empList[i]->showSalaryInfo();*/
+		for (int i = 0; i < empNum; i++)
+			empList[i]->showSalaryInfo();
 	}
 
 	void showTotalSalary() const
 	{
-		/*int sum = 0;
+		int sum = 0;
 		for (int i = 0; i < empNum; i++)
 			sum += empList[i]->getPay();
-		cout << "salary sum: " << sum << endl;*/
+		cout << "salary sum: " << sum << endl;
 	}
 
 	~EmployeeHandler()
@@ -134,13 +185,40 @@ public:
 
 int main()
 {
+	//핸들러 객체생성
 	EmployeeHandler handler;
-	handler.addEmployee(new PermanentWorker("Kim", 1000));
-	handler.addEmployee(new PermanentWorker("Lee", 1500));
-	handler.addEmployee(new PermanentWorker("Jun", 2000));
+	
+	//해외 영업직 등록
+	ForeignSalesWorker* fseller1 = new ForeignSalesWorker("Hong", 1000, 0.1, Risk_Level::Risk_A);
+	fseller1->addSalesResult(7000);
+	handler.addEmployee(fseller1);
+
+	ForeignSalesWorker* fseller2 = new ForeignSalesWorker("Yoon", 1000, 0.1, Risk_Level::Risk_B);
+	fseller2->addSalesResult(7000);
+	handler.addEmployee(fseller2);
+
+	ForeignSalesWorker* fseller3 = new ForeignSalesWorker("Lee", 1000, 0.1, Risk_Level::Risk_C);
+	fseller3->addSalesResult(7000);
+	handler.addEmployee(fseller3);
 
 	handler.showAllSalaryInfo();
-	handler.showTotalSalary();
+
+
+
+	////정규직
+	//handler.addEmployee(new PermanentWorker("Kim", 1000));
+	//handler.addEmployee(new PermanentWorker("Lee", 1500));
+	////임시직
+	//TemporaryWorker* alba = new TemporaryWorker("Jung", 700);
+	//alba->AddWorkTime(5);
+	//handler.addEmployee(alba);
+	////영업직
+	//SalesWorker* seller = new SalesWorker("Hong", 1000, 0.1);
+	//seller->addSalesResult(7000);
+	//handler.addEmployee(seller);
+	//handler.showAllSalaryInfo();
+	//handler.showTotalSalary();
+
 
 	return 0;
 }
