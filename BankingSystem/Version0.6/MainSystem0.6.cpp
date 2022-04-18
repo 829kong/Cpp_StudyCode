@@ -120,7 +120,7 @@ public:
 		cout << "신용등급: " << getGrade()  << endl;
 		cout << endl;
 	}
-};
+}; 
 
 class AccountHandler
 {
