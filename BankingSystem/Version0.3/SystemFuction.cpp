@@ -6,50 +6,50 @@ const int Name_len = 10;
 class Account
 {
 private:
-	int id;
-	string name;
-	int balance;
+	int m_id;
+	string m_name;
+	int m_balance;
 
 public:
 	Account(int _id, string _name, int _balance)
-		:id(_id),name(_name), balance(_balance)
+		:m_id(_id),m_name(_name), m_balance(_balance)
 	{
 		
 	}
 
 	Account(const Account& copy)
-		:id(copy.id),name(copy.name),balance(copy.balance)
+		:m_id(copy.m_id),m_name(copy.m_name),m_balance(copy.m_balance)
 	{
 
 	}
 
 	int Deposit(int money)
 	{
-		balance += money;
-		return balance;
+		m_balance += money;
+		return m_balance;
 	}
 
 	int Withdraw(int money)
 	{
-		balance -= money;
-		return balance;
+		m_balance -= money;
+		return m_balance;
 	}
 
 	int getId() const
 	{
-		return id;
+		return m_id;
 	}
 
 	int getBalance() const
 	{
-		return balance;
+		return m_balance;
 	}
 
 	void showAccInfo() const
 	{
-		cout << "°èÁÂID: " << id << endl;
-		cout << "ÀÌ ¸§: " << name << endl;
-		cout << "ÀÜ ¾×: " << balance << endl;
+		cout << "°èÁÂID: " << m_id << endl;
+		cout << "ÀÌ ¸§: " << m_name << endl;
+		cout << "ÀÜ ¾×: " << m_balance << endl;
 		cout << endl;
 	}
 };

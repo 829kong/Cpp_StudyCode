@@ -2,6 +2,7 @@
 #include <string>
 using namespace std;
 const int Name_len = 10;
+const double Percent = 0.01;
 
 enum Choice
 {
@@ -11,6 +12,11 @@ enum Choice
 	ALLSHOW,
 	EXIT,
 };
+
+namespace Credit_Grade
+{
+	enum { Grade_A = 7, Grade_B = 4, Grade_C = 2, };
+}
 
 class Account
 {
@@ -28,10 +34,9 @@ public:
 		:m_id(copy.m_id), m_name(copy.m_name), m_balance(copy.m_balance)
 	{}
 
-	int Deposit(int money)
+	virtual void Deposit(int money)
 	{
 		m_balance += money;
-		return m_balance;
 	}
 
 	int Withdraw(int money)
@@ -50,11 +55,69 @@ public:
 		return m_balance;
 	}
 
-	void showAccInfo() const
+	virtual void showAccInfo() const
 	{
 		cout << "계좌ID: " << m_id << endl;
 		cout << "이 름: " << m_name << endl;
 		cout << "잔 액: " << m_balance << endl;
+	}
+};
+
+class NormalAccount : public Account
+{
+private:
+	int m_interRate;
+
+public:
+	NormalAccount(int _id, string _name, int _balance,int _interRate)
+		:Account(_id,_name,_balance),m_interRate(_interRate)
+	{}
+
+	void Deposit(int money)
+	{
+		Account::Deposit(money);
+		Account::Deposit(money * (m_interRate * Percent));
+	}
+
+	void showAccInfo() const
+	{
+		Account::showAccInfo();
+		cout << "이자율: " << m_interRate << "%" << endl;
+		
+	}
+};
+
+class HighCreditAccount : public NormalAccount
+{
+private:
+	int m_specialInterate;
+
+public:
+	HighCreditAccount(int _id, string _name, int _balance, int _interest, int _specialInterate)
+		:NormalAccount(_id,_name,_balance,_interest),m_specialInterate(_specialInterate)
+	{}
+
+	int getGrade() const
+	{
+		if (m_specialInterate == Credit_Grade::Grade_A)
+			return 1;
+		else if (m_specialInterate == Credit_Grade::Grade_B)
+			return 2;
+		else if (m_specialInterate == Credit_Grade::Grade_C)
+			return 3;
+	}
+
+	void Deposit(int money)
+	{
+		NormalAccount::Deposit(money);
+		Account::Deposit(money * (m_specialInterate * Percent));
+	}
+
+	void showAccInfo() const
+	{
+		cout << endl;
+		NormalAccount::showAccInfo();
+		cout << "신용등급: " << getGrade()  << endl;
 		cout << endl;
 	}
 };
@@ -64,7 +127,7 @@ class AccountHandler
 private:
 	Account* acc[100];
 	int accountNum;
-	
+
 public:
 	AccountHandler(int num)
 		:accountNum(num)
@@ -80,18 +143,53 @@ public:
 		cout << "5. 프로그램 종료" << endl;
 	}
 
-	void makeAccount() 
+	void makeAccount()
 	{
-		int id, balance;
-		char name[Name_len];
-		cout << "[계좌개설]" << endl;
-		cout << "계좌ID: ";
-		cin >> id;
-		cout << "이 름: ";
-		cin >> name;
-		cout << "입금액: ";
-		cin >> balance;
-		acc[accountNum++] = new Account(id, name, balance);
+		int id, balance, num, interRate, grade;
+		string name;
+		cout << "[계좌종류선택]" << endl;
+		cout << "1.보통예금계좌" << " " << "2.신용신뢰계좌" << endl;
+		cout << "선택: ";
+		cin >> num;
+
+		switch (num)
+		{
+		case 1:
+			cout << "계좌ID: ";
+			cin >> id;
+			cout << "이 름: ";
+			cin >> name;
+			cout << "입금액: ";
+			cin >> balance;
+			cout << "이자율: ";
+			cin >> interRate;
+			acc[accountNum++] = new NormalAccount(id, name, balance,interRate);
+			break;
+			
+		case 2:
+			cout << "계좌ID: ";
+			cin >> id;
+			cout << "이 름: ";
+			cin >> name;
+			cout << "입금액: ";
+			cin >> balance;
+			cout << "이자율: ";
+			cin >> interRate;
+			cout << "신용등급(1toA,2toB,3toC): ";
+			cin >> grade;
+			switch (grade)
+			{
+			case 1:
+				acc[accountNum++] = new HighCreditAccount(id, name, balance, interRate, Credit_Grade::Grade_A);
+				break;
+			case 2:
+				acc[accountNum++] = new HighCreditAccount(id, name, balance, interRate, Credit_Grade::Grade_B);
+				break;
+			case 3:
+				acc[accountNum++] = new HighCreditAccount(id, name, balance, interRate, Credit_Grade::Grade_C);
+				break;
+			}
+		}
 	}
 
 	void depositMoney()
@@ -111,9 +209,8 @@ public:
 				cout << "입금완료" << endl;
 				return;
 			}
-			else
-				cout << "유효하지 않은 ID입니다." << endl;
 		}
+		cout << "유효하지 않은 ID입니다." << endl;
 	}
 
 	void withdrawMoney()
@@ -148,9 +245,10 @@ public:
 		{
 			acc[count]->showAccInfo();
 		}
+		cout << endl;
 	}
 
-	void deleteAcc()
+	~AccountHandler()
 	{
 		for (int i = 0; i < accountNum; i++)
 		{
@@ -191,7 +289,6 @@ int main()
 			break;
 
 		case EXIT:
-			ah.deleteAcc();
 			cout << "프로그램을 종료합니다" << endl;
 			return 0;
 

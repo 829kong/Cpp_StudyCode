@@ -6,49 +6,49 @@ const int Name_len = 10;
 class Account
 {
 private:
-	int id;
-	char *name;
-	int balance;
+	int m_id;
+	char *m_name;
+	int m_balance;
 
 public:
 	Account(int _id, char *_name, int _balance)
-		:id(_id),balance(_balance)
+		:m_id(_id),m_balance(_balance)
 	{
-		name = new char[strlen(_name + 1)];
-		strcpy_s(name, sizeof(name), _name);
+		m_name = new char[strlen(_name + 1)];
+		strcpy_s(m_name, sizeof(m_name), _name);
 	}
 	~Account()
 	{
-		delete[] name;
+		delete[] m_name;
 	}
 
 	int Deposit(int money)
 	{
-		balance += money;
-		return balance;
+		m_balance += money;
+		return m_balance;
 	}
 
 	int Withdraw(int money)
 	{
-		balance -= money;
-		return balance;
+		m_balance -= money;
+		return m_balance;
 	}
 
 	int getId() const
 	{
-		return id;
+		return m_id;
 	}
 
 	int getBalance() const
 	{
-		return balance;
+		return m_balance;
 	}
 
 	void showAccInfo() const
 	{
-		cout << "°èÁÂID: " << id << endl;
-		cout << "ÀÌ ¸§: " << name << endl;
-		cout << "ÀÜ ¾×: " << balance << endl;
+		cout << "°èÁÂID: " << m_id << endl;
+		cout << "ÀÌ ¸§: " << m_name << endl;
+		cout << "ÀÜ ¾×: " << m_balance << endl;
 		cout << endl;
 	}
 };
