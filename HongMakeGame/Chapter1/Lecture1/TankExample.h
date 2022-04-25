@@ -4,6 +4,7 @@
 
 namespace jm
 {
+	using namespace std;
 	class MyTank
 	{
 	public:
@@ -42,27 +43,34 @@ namespace jm
 
 		void update(const float& dt)
 		{
-			center += velocity * dt;
+			center += velocity * dt*0.1;
 		}
 	};
 
 	class TankExample : public Game2D
 	{
+	private:
+		int n;
+
 	public:
 		MyTank tank;
 
-		MyBullet *bullet = nullptr;
+		//MyBullet *bullet = nullptr;
+		vector<MyBullet*> bullets ;
 		//TODO: allow multiple bullets
 		//TODO: delete bullets when they go out of the screen
 
 	public:
 		TankExample()
-			: Game2D("This is my digital canvas!", 1024, 768, false, 2)
+			: Game2D("This is my digital canvas!", 1024, 768, false, 2),n(0)
 		{}
 
 		~TankExample()
 		{
-			if(bullet != nullptr) delete bullet;
+			/*if (bullet != nullptr)
+			{
+				delete bullet;
+			}*/
 		}
 
 		void update() override
@@ -76,18 +84,43 @@ namespace jm
 			// shoot a cannon ball
 			if (isKeyPressedAndReleased(GLFW_KEY_SPACE))
 			{
-				bullet = new MyBullet;
-				bullet->center = tank.center;
-				bullet->center.x += 0.2f;
-				bullet->center.y += 0.1f;
-				bullet->velocity = vec2(2.0f, 0.0f);
+				bullets.push_back(new MyBullet);
+				bullets.back()->center = tank.center;
+				bullets.back()->center.x += 0.2f;
+				bullets.back()->center.y += 0.1f;
+				bullets.back()->velocity = vec2(2.0f, 0.0f);
+				cout << bullets.size() << endl;
+				
 			}
 
-			if (bullet != nullptr) bullet->update(getTimeStep());
+			if (!bullets.empty())
+			{
+				for (int i = 0; i < bullets.size(); ++i)
+				{
 
+					bullets.at(i)->update(getTimeStep());
+					bullets.at(i)->draw();
+					/*if (bullets.front()->center.x > 1.4f)
+					{
+						delete bullets.front();
+						bullets.erase(bullets.begin());
+						cout << "delete bullets" << endl;
+					}*/
+				}
+			}
 			// rendering
 			tank.draw();
-			if (bullet != nullptr) bullet->draw();
+			if (!bullets.empty())
+			{
+				for (int i = 0; i < bullets.size(); i++)
+				{
+					if (bullets[i]->center.x > 1.5f)   
+					{
+						delete bullets[i];                  
+						bullets.erase(bullets.begin() + i); 
+					}
+				}
+			}
 		}
 	};
 }

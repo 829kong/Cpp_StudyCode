@@ -240,7 +240,7 @@ namespace jm
 			drawGrid();
 
 			update();	// the major worker function
-
+			
 			glPopMatrix();
 
 			// post draw

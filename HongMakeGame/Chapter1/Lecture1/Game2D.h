@@ -14,6 +14,9 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <cstdlib>
+#include <ctime>
+#include <random>
 
 namespace jm
 {
